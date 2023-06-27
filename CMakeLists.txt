@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 3.4...3.18)
+project(dxz)
+add_subdirectory(pybind11)
+pybind11_add_module(dxz my_dxz.cpp)
