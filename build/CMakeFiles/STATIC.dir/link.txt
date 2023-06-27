@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSTATIC.a CMakeFiles/STATIC.dir/my_dxz.cpp.o CMakeFiles/STATIC.dir/sparse_matrix.c.o CMakeFiles/STATIC.dir/quad_linked_list.c.o
+/usr/bin/ranlib libSTATIC.a

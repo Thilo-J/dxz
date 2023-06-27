@@ -8,14 +8,10 @@ extern "C" {
 #include <map>
 #include <tuple>
 #include <list>
-#include <fstream>
-#include <string>
 #include <sstream>
-#include <windows.h>
 #include "my_dxz.h"
 #include <vector>
-#include <unordered_map>
-#include <chrono>
+#include <algorithm>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -24,7 +20,7 @@ namespace py = pybind11;
 int node_counter = 1;
 
 struct VectorHasher {
-    int operator()(const std::vector<int>& V) const {
+    int operator()(const std::vector<size_t>& V) const {
         int hash = V.size();
         for (auto& i : V) {
             hash ^= i + 0x9e3779b9 + (hash << 6) + (hash >> 2);
@@ -44,7 +40,7 @@ const Node* bottom = new Node({ -2, NULL, NULL });
 
 struct dxz_manager {
     const Node* root = bottom;
-    std::unordered_map<std::vector<int>, const Node*, VectorHasher> cache;
+    std::unordered_map<std::vector<size_t>, const Node*, VectorHasher> cache;
 };
 
 const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
@@ -56,10 +52,10 @@ const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
     }
 
     //Check cache
-    std::vector<int> cache_key;
+    std::vector<size_t> cache_key;
     list key_col = sparse_matrix;
     while ((key_col = get_right(key_col)) != sparse_matrix) {
-        cache_key.push_back((int)key_col);
+        cache_key.push_back((size_t)key_col);
     }
     auto iter = manager->cache.find(cache_key);
     if (iter != manager->cache.end()) {
@@ -98,14 +94,6 @@ const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
     
 }
 
-const Node* dxz_get_exact_covers(int rows, int cols, int matrix[]) {
-    dxz_manager manager;
-    list sparse_matrix;
-    sparse_matrix = create_sparse(rows, cols, matrix);
-    free(matrix);
-    search(sparse_matrix, 0, rows, &manager);
-    return manager.root;
-}
 
 void preorder_traversal(const Node* node, const Node* prev, bool add, std::vector<int>* solution, std::list<std::vector<int>>* solutions)
 {
@@ -123,21 +111,25 @@ void preorder_traversal(const Node* node, const Node* prev, bool add, std::vecto
 std::list<std::vector<int>> get_solutions(const Node* root) {
     std::list<std::vector<int>> solutions;
     std::vector<int> solution;
-    if (root == bottom) return solutions;
     preorder_traversal(root->left, root, false, &solution, &solutions);
     preorder_traversal(root->right, root, true, &solution, &solutions);
     return solutions;
 }
 
-
-std::list<std::vector<int>> solve_matrix(int rows, int cols, int matrix[])
-{
-    const Node* node = dxz_get_exact_covers(rows, cols, matrix);
-    return get_solutions(node);
+std::list<std::vector<int>>  dxz_get_exact_covers(int rows, int cols, std::list<int> matrix) {
+    int arr[matrix.size()];
+    std::copy(matrix.begin(), matrix.end(), arr);
+    dxz_manager manager;
+    list sparse_matrix;
+    sparse_matrix = create_sparse(rows, cols, arr);
+    search(sparse_matrix, 0, rows, &manager);
+    std::list<std::vector<int>> solutions = get_solutions(manager.root);
+    return solutions;
 }
 
 PYBIND11_MODULE(dxz, module_handle)
 {
-    module_handle.doc() = "C++ dxz solver";
-    module_handle.def("dxz_solve", &solve_matrix);
+    module_handle.doc() = "Exact cover solver that returns all solutions";
+    module_handle.def("dxz_solve", &dxz_get_exact_covers);
 }
+

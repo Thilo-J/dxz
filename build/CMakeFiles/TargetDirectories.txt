@@ -1,0 +1,5 @@
+/home/thilo/Desktop/dxz/build/CMakeFiles/dxz.dir
+/home/thilo/Desktop/dxz/build/CMakeFiles/edit_cache.dir
+/home/thilo/Desktop/dxz/build/CMakeFiles/rebuild_cache.dir
+/home/thilo/Desktop/dxz/build/pybind11/CMakeFiles/edit_cache.dir
+/home/thilo/Desktop/dxz/build/pybind11/CMakeFiles/rebuild_cache.dir
