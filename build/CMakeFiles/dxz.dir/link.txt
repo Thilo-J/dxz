@@ -1,1 +1,0 @@
-/usr/bin/g++ -fPIC -g -shared  -o dxz.cpython-310-x86_64-linux-gnu.so CMakeFiles/dxz.dir/my_dxz.cpp.o CMakeFiles/dxz.dir/sparse_matrix.c.o CMakeFiles/dxz.dir/quad_linked_list.c.o 

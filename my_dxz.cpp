@@ -1,5 +1,4 @@
-﻿#include <iostream>
-extern "C"{
+﻿extern "C"{
 #include "quad_linked_list.h"
 }
 extern "C" {
@@ -12,6 +11,7 @@ extern "C" {
 #include "my_dxz.h"
 #include <vector>
 #include <algorithm>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -35,12 +35,14 @@ struct Node {
     const Node* right;
 };
 
-const Node* top = new Node({ -1, NULL, NULL });
-const Node* bottom = new Node({ -2, NULL, NULL });
+
+const Node* top = new Node({-1, NULL, NULL});
+const Node* bottom = new Node({-2, NULL, NULL});
 
 struct dxz_manager {
     const Node* root = bottom;
     std::unordered_map<std::vector<size_t>, const Node*, VectorHasher> cache;
+
 };
 
 const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
@@ -77,7 +79,6 @@ const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
         for (next = row; (next = get_left(next)) != row; )
             uncover_column(get_data(next)->list_data);
         if (y->value != -2) {
-            //x = get_node(row_index, x, y, manager);
             x = new Node({
                 row_index,
                 x,
@@ -95,24 +96,24 @@ const Node* search(list sparse_matrix, int k, int max, dxz_manager* manager) {
 }
 
 
-void preorder_traversal(const Node* node, const Node* prev, bool add, std::vector<int>* solution, std::list<std::vector<int>>* solutions)
+void preorder_traversal(const Node* node, std::vector<int>* solution, std::list<std::vector<int>>* solutions)
 {
-    if (add)
-        solution->push_back(prev->value);
-    if (node->value == -2)
+    if(node->value == -2)
         return;
-    if (node->value == -1)
+    if(node->value == -1)
         return solutions->push_back(*solution);
-    preorder_traversal(node->left, node, false, solution, solutions);
-    preorder_traversal(node->right, node, true, solution, solutions);
+    preorder_traversal(node->left, solution, solutions);
+    solution->push_back(node->value);
+    preorder_traversal(node->right, solution, solutions);
     solution->pop_back();
 }
 
-std::list<std::vector<int>> get_solutions(const Node* root) {
+
+std::list<std::vector<int>> zdd_to_list(const Node* root)
+{
     std::list<std::vector<int>> solutions;
     std::vector<int> solution;
-    preorder_traversal(root->left, root, false, &solution, &solutions);
-    preorder_traversal(root->right, root, true, &solution, &solutions);
+    preorder_traversal(root, &solution, &solutions);
     return solutions;
 }
 
@@ -123,7 +124,7 @@ std::list<std::vector<int>>  dxz_get_exact_covers(int rows, int cols, std::list<
     list sparse_matrix;
     sparse_matrix = create_sparse(rows, cols, arr);
     search(sparse_matrix, 0, rows, &manager);
-    std::list<std::vector<int>> solutions = get_solutions(manager.root);
+    std::list<std::vector<int>>  solutions = zdd_to_list(manager.root);
     return solutions;
 }
 

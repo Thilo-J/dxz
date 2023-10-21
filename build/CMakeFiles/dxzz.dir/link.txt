@@ -1,2 +1,0 @@
-/usr/bin/ar qc libdxzz.a CMakeFiles/dxzz.dir/my_dxz.cpp.o CMakeFiles/dxzz.dir/sparse_matrix.c.o CMakeFiles/dxzz.dir/quad_linked_list.c.o
-/usr/bin/ranlib libdxzz.a
