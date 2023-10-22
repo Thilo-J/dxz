@@ -128,8 +128,9 @@ std::list<std::vector<int>> zdd_to_list(const Node* root, int max_solutions)
 }
 
 std::list<std::vector<int>>  dxz_get_exact_covers(int rows, int cols, std::list<int> matrix, int max_solutions) {
-    int arr[matrix.size()];
+    int* arr = new int[matrix.size()];
     std::copy(matrix.begin(), matrix.end(), arr);
+    
     dxz_manager manager;
     list sparse_matrix;
     sparse_matrix = create_sparse(rows, cols, arr);
@@ -147,7 +148,7 @@ int node_count(const Node* node)
 
 
 int dxz_get_number_of_solutions(int rows, int cols, std::list<int> matrix) {
-    int arr[matrix.size()];
+    int* arr = new int[matrix.size()];
     std::copy(matrix.begin(), matrix.end(), arr);
     dxz_manager manager;
     list sparse_matrix;
